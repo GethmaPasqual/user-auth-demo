@@ -1,21 +1,14 @@
 import React from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
+import LoginPage from "./pages/loginPage/LoginPage";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 export default function App() {
-  const { state, signIn, signOut } = useAuthContext();
+  const { state } = useAuthContext();
 
   if (!state?.isAuthenticated) {
-    return (
-      <div style={{ padding: 40 }}>
-        <button onClick={() => signIn()}>Sign In</button>
-      </div>
-    );
+    return <LoginPage />;
   }
 
-  return (
-    <div style={{ padding: 40 }}>
-      <h2>Welcome!</h2>
-      <button onClick={() => signOut()}>Sign Out</button>
-    </div>
-  );
+  return <Dashboard />;
 }
