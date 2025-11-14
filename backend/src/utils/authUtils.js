@@ -1,12 +1,15 @@
 // Extract user information from JWT token
 const getUserInfo = (req) => {
+  const auth = req.auth || {};
+  const permissions = auth.permissions || auth.groups || [];
+  
   return {
-    userId: req.auth?.sub,
-    email: req.auth?.email,
-    username: req.auth?.username || req.auth?.preferred_username,
-    roles: req.auth?.permissions || req.auth?.groups || [],
-    fullName: req.auth?.name,
-    isAdmin: (req.auth?.permissions || req.auth?.groups || []).some(
+    userId: auth.sub,
+    email: auth.email,
+    username: auth.username || auth.preferred_username,
+    roles: permissions,
+    fullName: auth.name,
+    isAdmin: permissions.some(
       role => role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator'
     )
   };
@@ -14,7 +17,8 @@ const getUserInfo = (req) => {
 
 // Check if user has specific role
 const hasRole = (req, roleName) => {
-  const roles = req.auth?.permissions || req.auth?.groups || [];
+  const auth = req.auth || {};
+  const roles = auth.permissions || auth.groups || [];
   return roles.some(role => role.toLowerCase() === roleName.toLowerCase());
 };
 

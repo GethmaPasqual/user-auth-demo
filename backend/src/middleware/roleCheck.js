@@ -3,7 +3,7 @@ const requireRole = (allowedRoles) => {
   return (req, res, next) => {
     // Extract roles from JWT token
     // Asgardeo includes roles in the token under 'groups' or 'roles' claim
-    const userRoles = req.auth?.permissions || req.auth?.groups || [];
+    const userRoles = (req.auth && req.auth.permissions) || (req.auth && req.auth.groups) || [];
     
     // Check if user has at least one of the allowed roles
     const hasRole = allowedRoles.some(role => userRoles.includes(role));
