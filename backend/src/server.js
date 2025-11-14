@@ -1,8 +1,16 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./config/.env" });
 const express = require("express");
+const cors = require("cors");
 const { auth } = require("express-oauth2-jwt-bearer");
 
 const app = express();
+
+// Enable CORS for frontend
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000"
+}));
+
+app.use(express.json());
 
 // ✅ Middleware to validate JWT Access Tokens issued by Asgardeo
 const checkJwt = auth({

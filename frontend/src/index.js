@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { AuthProvider } from "@asgardeo/auth-react";
 import App from "./App";
+import "./index.css";
 
 const config = {
   signInRedirectURL: "http://localhost:3000",
@@ -9,8 +10,6 @@ const config = {
   clientID: "KYEfJzks5uXRratlXxNpS9dvpRQa",
   baseUrl: "https://api.asgardeo.io/t/testforfinalproject"
 };
-
-console.log("Asgardeo config:", config);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
