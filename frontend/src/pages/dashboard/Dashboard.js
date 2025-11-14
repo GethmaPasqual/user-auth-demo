@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '@asgardeo/auth-react';
+import MicroservicesDemo from '../../components/MicroservicesDemo';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -19,7 +20,7 @@ const Dashboard = () => {
     setError(null);
     try {
       const token = await getAccessToken();
-      const response = await fetch('http://localhost:4000/api/protected', {
+      const response = await fetch('http://localhost:4000/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -110,7 +111,7 @@ const Dashboard = () => {
             className="test-button"
             disabled={loading}
           >
-            {loading ? 'Testing...' : 'Test Backend API'}
+            {loading ? 'Testing...' : 'Test Admin API'}
           </button>
           
           {error && (
@@ -123,12 +124,15 @@ const Dashboard = () => {
             <div className="success-message">
               <p>✅ {backendData.message}</p>
               <div className="backend-data">
-                <h4>User Data from Backend:</h4>
-                <pre>{JSON.stringify(backendData.user, null, 2)}</pre>
+                <h4>Dashboard Stats from Backend:</h4>
+                <pre>{JSON.stringify(backendData.stats, null, 2)}</pre>
               </div>
             </div>
           )}
         </div>
+
+        {/* Microservices Demo Section */}
+        <MicroservicesDemo />
       </div>
     </div>
   );
