@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { AuthProvider } from "@asgardeo/auth-react";
-import App from "./App";
+import App from "./App.jsx";
 
 const config = {
   signInRedirectURL: "http://localhost:3000",
