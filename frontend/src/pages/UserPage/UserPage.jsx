@@ -33,6 +33,10 @@ function UserPage() {
 
   return (
     <div className="user-page">
+      <div className="page-title-banner">
+        <h1 className="page-title">User Page</h1>
+        <p className="page-subtitle">Standard User Dashboard</p>
+      </div>
       <div className="user-container">
         <div className="user-header">
           <h1>👤 User Dashboard</h1>

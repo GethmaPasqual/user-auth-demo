@@ -1,28 +1,38 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuthContext } from "@asgardeo/auth-react"
-import Login from "./pages/Login"
-import UserPage from "./pages/UserPage"
-import AdminPage from "./pages/AdminPage"
+import Login from "./pages/Login/Login"
+import UserPage from "./pages/UserPage/UserPage"
+import AdminPage from "./pages/AdminPage/AdminPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import './App.css'
 
 function App() {
   const { state } = useAuthContext()
 
-  // Home route logic: redirect based on authentication
-  const HomePage = () => {
+  // Root route - redirect based on authentication and role
+  const RootRedirect = () => {
     if (!state.isAuthenticated) {
       return <Navigate to="/login" replace />
     }
-    // Default authenticated users to user page
-    return <Navigate to="/user" replace />
+    
+    // Check if user has admin role
+    const roles = state.roles || []
+    const userRoles = typeof roles === 'string' ? roles.split(',').map(r => r.trim()) : roles
+    const isAdmin = userRoles.some(role => role.toLowerCase() === 'admin')
+    
+    // Redirect based on role
+    if (isAdmin) {
+      return <Navigate to="/admin" replace />
+    } else {
+      return <Navigate to="/user" replace />
+    }
   }
 
   return (
     <div className="app">
       <Routes>
-        {/* Home - redirects based on auth status */}
-        <Route path="/" element={<HomePage />} />
+        {/* Root - redirects to login or dashboard based on auth */}
+        <Route path="/" element={<RootRedirect />} />
         
         {/* Login page */}
         <Route path="/login" element={<Login />} />

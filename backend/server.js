@@ -28,16 +28,24 @@ const checkJwt = jwt({
 const checkRole = (role) => {
   return (req, res, next) => {
     // The token data is in req.auth (added by checkJwt)
-    // Your screenshot shows 'Roles' are available. Let's check them.
-    const roles = req.auth.roles || [];
+    // Handle both string and array formats for roles
+    let roles = req.auth.roles || [];
+    
+    // If roles is a string, convert it to array
+    if (typeof roles === 'string') {
+      roles = roles.split(',').map(r => r.trim());
+    }
 
-    // Your screenshot shows a role named "Admin"
-    if (roles.includes(role)) {
+    // Check if user has the required role (case-insensitive)
+    const hasRole = roles.some(r => r.toLowerCase() === role.toLowerCase());
+    
+    if (hasRole) {
       next(); // User has the role, proceed
     } else {
       res.status(403).json({ 
-        message: "Forbidden: Requires admin role",
-        yourRoles: roles 
+        message: `Forbidden: Requires ${role} role`,
+        yourRoles: roles,
+        requiredRole: role
       });
     }
   };
@@ -63,13 +71,22 @@ app.get('/api/private', checkJwt, (req, res) => {
   });
 });
 
-// Admin: Requires valid token AND 'Admin' role (Task 3)
-app.get('/api/admin', checkJwt, checkRole('Admin'), (req, res) => {
-  // If we get here, both checkJwt and checkRole('Admin') passed
+// Admin: Requires valid token AND 'admin' role (Task 3)
+app.get('/api/admin', checkJwt, checkRole('admin'), (req, res) => {
+  // If we get here, both checkJwt and checkRole('admin') passed
+  
+  // Normalize roles to array format for response
+  let roles = req.auth.roles || [];
+  if (typeof roles === 'string') {
+    roles = roles.split(',').map(r => r.trim());
+  }
+  
   res.json({ 
     message: "This is an ADMIN-ONLY endpoint. Welcome, admin!",
     user: req.auth.sub || req.auth.preferred_username,
-    roles: req.auth.roles,
+    username: req.auth.username,
+    email: req.auth.email,
+    roles: roles,
     tokenData: req.auth
   });
 });

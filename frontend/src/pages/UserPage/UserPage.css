@@ -1,7 +1,65 @@
 .user-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
   padding: 2rem;
+}
+
+/* Beautiful Page Title Banner */
+.page-title-banner {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 194, 255, 0.3);
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-title-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+.page-title {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-subtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
 }
 
 .user-container {
@@ -13,16 +71,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   padding: 1.5rem 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .user-header h1 {
   margin: 0;
-  color: #333;
+  color: #0072ff;
+  text-shadow: 1px 1px 2px rgba(0, 114, 255, 0.1);
 }
 
 .logout-btn {
@@ -42,12 +102,13 @@
 }
 
 .welcome-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   color: white;
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 12px;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 194, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .welcome-section h2 {
@@ -69,8 +130,9 @@
 }
 
 .badge-user {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .badge-admin {
@@ -86,16 +148,18 @@
 }
 
 .info-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .info-card h3 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: #0072ff;
   font-size: 1.3rem;
+  font-weight: 700;
 }
 
 .profile-info .info-row {
@@ -148,15 +212,17 @@
 }
 
 .features-section {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .features-section h3 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: #0072ff;
+  font-weight: 700;
 }
 
 .feature-grid {
@@ -166,17 +232,24 @@
 }
 
 .feature-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, #e0f7ff 0%, #b3e5fc 100%);
   padding: 1.5rem;
   border-radius: 12px;
   text-align: center;
   transition: all 0.3s;
   cursor: pointer;
+  border: 1px solid rgba(0, 194, 255, 0.2);
 }
 
 .feature-card:hover:not(.disabled) {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 194, 255, 0.3);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.feature-card:hover:not(.disabled) h4,
+.feature-card:hover:not(.disabled) p {
+  color: white;
 }
 
 .feature-card.disabled {

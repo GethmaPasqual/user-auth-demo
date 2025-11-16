@@ -121,19 +121,29 @@ function AdminPage() {
                 <div className="admin-info">
                   <div className="info-row">
                     <span className="label">Username:</span>
-                    <span className="value">{state.username || 'N/A'}</span>
+                    <span className="value">{adminData?.username || state.username || 'N/A'}</span>
                   </div>
                   <div className="info-row">
                     <span className="label">Email:</span>
-                    <span className="value">{state.email || 'N/A'}</span>
+                    <span className="value">{adminData?.email || state.email || 'N/A'}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">User ID:</span>
+                    <span className="value">{adminData?.user || 'N/A'}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Roles:</span>
+                    <span className="value">
+                      {adminData?.roles ? (
+                        Array.isArray(adminData.roles) 
+                          ? adminData.roles.join(', ') 
+                          : adminData.roles
+                      ) : 'N/A'}
+                    </span>
                   </div>
                   <div className="info-row">
                     <span className="label">Access Level:</span>
                     <span className="value">Full Administrator</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Privileges:</span>
-                    <span className="value">All System Access</span>
                   </div>
                 </div>
               </div>
