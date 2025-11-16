@@ -11,7 +11,7 @@ const config = {
   signOutRedirectURL: "http://localhost:3000",
   clientID: "KYEfJzks5uXRratlXxNpS9dvpRQa",
   baseUrl: "https://api.asgardeo.io/t/testforfinalproject",
-  scope: ["openid", "profile"],
+  scope: ["openid", "email", "groups", "profile", "roles"],
   resourceServerURLs: ["http://localhost:8080"]
 }
 
