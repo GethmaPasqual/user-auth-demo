@@ -1,40 +1,16 @@
 {
-  "name": "team1",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@asgardeo/auth-react": "^5.4.3",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
+  "name": "user-auth-demo",
+  "version": "1.0.0",
+  "description": "Full-stack Asgardeo OAuth authentication demo with React and Express",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "clean": "rm -rf backend/node_modules frontend/node_modules"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "keywords": ["asgardeo", "oauth", "react", "express", "jwt", "rbac"],
+  "author": "",
+  "license": "ISC"
 }
