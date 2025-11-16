@@ -14,11 +14,12 @@ This project demonstrates the implementation of a User & Identity Service using 
 ## 📋 Table of Contents
 
 1. [Asgardeo Feasibility Analysis](#1-asgardeo-feasibility-analysis)
-2. [React Integration](#2-react-integration-with-asgardeo)
-3. [Node.js Integration](#3-nodejs-integration-with-asgardeo)
-4. [Role-Based Access Control](#4-role-based-access-control-rbac)
-5. [Microservice Authentication](#5-microservice-authentication-sharing)
-6. [Running the Project](#6-running-the-project)
+2. [Asgardeo Application Configuration](#2-asgardeo-application-configuration)
+3. [React Integration](#3-react-integration-with-asgardeo)
+4. [Node.js Integration](#4-nodejs-integration-with-asgardeo)
+5. [Role-Based Access Control](#5-role-based-access-control-rbac)
+6. [Microservice Authentication](#6-microservice-authentication-sharing)
+7. [Running the Project](#7-running-the-project)
 
 ---
 
@@ -73,7 +74,424 @@ This project demonstrates the implementation of a User & Identity Service using 
 
 ---
 
-## 2. React Integration with Asgardeo
+## 2. Asgardeo Application Configuration
+
+### Overview
+
+When you register an application in Asgardeo, you need to configure various OIDC (OpenID Connect) settings to ensure proper authentication flow. This section covers all essential configurations.
+
+### 2.1 Basic Settings
+
+#### Client Credentials
+
+When your application is registered in Asgardeo, you receive:
+- **Client ID**: Unique identifier for your application
+- **Client Secret**: Secret key for confidential clients (not for public clients like SPAs)
+
+**For this project:**
+```env
+CLIENT_ID=YOUR_CLIENT_ID_HERE
+CLIENT_SECRET=YOUR_CLIENT_SECRET_HERE (Backend only)
+```
+
+**Important Notes:**
+- ✅ React SPA should **not** use client secret (it's a public client)
+- ✅ Backend Node.js API can use client secret for server-to-server communication
+- ✅ Store credentials in `.env` file, never commit to version control
+
+#### Allowed Grant Types
+
+Grant types determine how your application communicates with the token service.
+
+**For Team 1 Project:**
+
+| Grant Type | Purpose | Used In |
+|------------|---------|---------|
+| **Code** ✅ | OAuth2 Authorization Code flow | React frontend |
+| **Refresh Token** ✅ | Get new access tokens without re-login | React frontend |
+| **Client Credentials** | Machine-to-machine authentication | Optional (backend-to-backend) |
+
+**Not Recommended:**
+- ❌ **Implicit**: Security concerns, deprecated
+- ❌ **Password**: Exposes user credentials to client
+
+**Configuration:**
+1. Login to Asgardeo Console
+2. Go to **Applications** → Your App
+3. Navigate to **Protocol** tab
+4. Under **Allowed grant types**, select:
+   - ✅ Code
+   - ✅ Refresh Token
+
+#### Authorized Redirect URLs
+
+These URLs determine where Asgardeo redirects users after login and logout.
+
+**For Development:**
+```
+http://localhost:3000
+http://localhost:3000/
+```
+
+**For Production:**
+```
+https://yourdomain.com
+https://yourdomain.com/dashboard
+```
+
+**Important:**
+- The `redirect_uri` in login request **must exactly match** one of these URLs
+- The `post_logout_redirect_uri` in logout request **must exactly match** one of these URLs
+- Multiple URLs can be registered
+
+**Configuration:**
+1. Go to **Protocol** tab in your Asgardeo application
+2. Add URLs under **Authorized redirect URLs**
+3. Click **Update**
+
+#### Allowed Origins
+
+Enable CORS (Cross-Origin Resource Sharing) to allow your React app to call Asgardeo APIs.
+
+**For Development:**
+```
+http://localhost:3000
+```
+
+**For Production:**
+```
+https://yourdomain.com
+```
+
+**What This Enables:**
+- ✅ Token endpoint access
+- ✅ JWKS endpoint access  
+- ✅ UserInfo endpoint access
+- ✅ Other Asgardeo APIs
+
+### 2.2 Advanced Settings
+
+#### Proof Key for Code Exchange (PKCE)
+
+PKCE adds security to the authorization code flow by preventing authorization code interception attacks.
+
+**Recommended Configuration:**
+- ✅ **Mandatory**: Enable this for all applications
+- ❌ **Support Plain Transform Algorithm**: Disable (not secure for production)
+
+**How PKCE Works:**
+1. Client generates `code_verifier` (random string)
+2. Client creates `code_challenge` = SHA256(code_verifier)
+3. Client sends `code_challenge` in authorization request
+4. Client sends `code_verifier` in token request
+5. Server verifies: SHA256(code_verifier) == code_challenge
+
+**Sample Authorization Request:**
+```
+https://api.asgardeo.io/t/YOUR_ORG/oauth2/authorize
+  ?response_type=code
+  &client_id=YOUR_CLIENT_ID
+  &redirect_uri=http://localhost:3000
+  &scope=openid profile email
+  &code_challenge=CHALLENGE_HERE
+  &code_challenge_method=S256
+```
+
+**Sample Token Request:**
+```bash
+curl -X POST https://api.asgardeo.io/t/YOUR_ORG/oauth2/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=authorization_code" \
+  -d "code=AUTHORIZATION_CODE" \
+  -d "redirect_uri=http://localhost:3000" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "code_verifier=VERIFIER_HERE"
+```
+
+**Note:** `@asgardeo/auth-react` SDK handles PKCE automatically!
+
+#### Client Authentication
+
+For applications using a client secret, this determines how the client authenticates.
+
+**Available Methods:**
+
+| Method | Description | Use Case |
+|--------|-------------|----------|
+| **Client Secret Basic** | Credentials in Authorization header | Default, widely supported |
+| **Client Secret Post** | Credentials in request body | Alternative to Basic |
+| **Private Key JWT** | JWT signed with private key | High security, no secrets transmitted |
+| **Mutual TLS** | TLS certificate-based | Highest security, enterprise |
+
+**For This Project:**
+- React frontend: **None** (public client)
+- Backend API: **Client Secret Basic** (if using client credentials grant)
+
+#### Public Client
+
+✅ **React SPA is a Public Client**
+
+Public clients cannot securely store secrets because:
+- Source code is visible to users
+- DevTools can inspect all JavaScript
+- No secure backend storage
+
+**Security Measures for Public Clients:**
+1. ✅ Use **Code** grant type (not Implicit or Password)
+2. ✅ Enable **PKCE** (Mandatory)
+3. ✅ No client secret in frontend code
+4. ✅ Short access token expiry times
+5. ✅ Implement refresh token rotation
+
+### 2.3 Token Configuration
+
+#### Access Token Type
+
+Asgardeo supports two token types:
+
+**1. JWT (Recommended)**
+- Self-contained, verifiable
+- Contains user info (sub, email, roles)
+- No need to call introspection endpoint
+- Can be validated locally
+
+**Example JWT Access Token:**
+```json
+{
+  "sub": "user-12345",
+  "aud": "YOUR_CLIENT_ID",
+  "scope": "openid profile",
+  "groups": ["user", "admin"],
+  "exp": 1700000000,
+  "iat": 1699996400
+}
+```
+
+**2. Opaque**
+- Plain text token (random string)
+- Requires introspection endpoint call
+- More control over revocation
+
+**For This Project:** Use **JWT** for stateless architecture
+
+#### Access Token Attributes
+
+For JWT tokens, you can specify which user attributes are included.
+
+**Common Attributes:**
+- `sub` (User ID) - Always included
+- `email` - User email address
+- `username` - Username
+- `groups` - User roles (for RBAC)
+- `given_name` - First name
+- `family_name` - Last name
+
+**Configuration:**
+1. Go to **User Attributes** tab
+2. Select attributes to include in access token
+3. These appear in JWT payload
+
+#### Token Expiry Times
+
+**Recommended Values:**
+
+| Token Type | Default | Recommended | Purpose |
+|------------|---------|-------------|---------|
+| User Access Token | 3600s (1h) | 900s (15m) | Short-lived for security |
+| Application Access Token | 3600s (1h) | 3600s (1h) | Backend services |
+| ID Token | 3600s (1h) | 3600s (1h) | User authentication |
+| Refresh Token | 86400s (24h) | 86400s (24h) | Token renewal |
+
+**Configuration:**
+1. Go to **Protocol** → **Access Token** section
+2. Set **User access token expiry time**: `900` (15 minutes)
+3. Set **Refresh token expiry time**: `86400` (24 hours)
+
+#### Token Binding
+
+Token binding securely links tokens to client devices to prevent theft.
+
+**Available Types:**
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **none** | No binding | Default, least secure |
+| **cookie** | Binds to secure cookie | Web applications |
+| **sso-session** | Binds to browser session | Single sign-on |
+| **certificate** | Binds to TLS certificate | Enterprise, high security |
+
+**For This Project:**
+- Development: **none**
+- Production: **sso-session** or **cookie**
+
+#### Refresh Token Configuration
+
+**Renew Refresh Token:**
+- ✅ **Enabled**: Issues new refresh token on each use (more secure)
+- ❌ **Disabled**: Reuses same refresh token until expiry
+
+**For This Project:** Enable for production
+
+### 2.4 ID Token Configuration
+
+#### Audience
+
+By default, the client ID is added as the audience. You can add additional audiences.
+
+**Example ID Token:**
+```json
+{
+  "aud": ["YOUR_CLIENT_ID", "additional-audience"],
+  "sub": "user-12345",
+  "email": "user@example.com",
+  "iss": "https://api.asgardeo.io/t/YOUR_ORG/oauth2/token",
+  "exp": 1700000000,
+  "iat": 1699996400
+}
+```
+
+#### Encryption
+
+Enable ID token encryption for additional security.
+
+**Requirements:**
+1. Upload application certificate (`.pem` format)
+2. Select encryption algorithm (RSA-OAEP recommended)
+3. Select encryption method (A128GCM recommended)
+
+**For This Project:** Optional, not required for development
+
+### 2.5 User Attributes Configuration
+
+Control which user attributes are included in tokens based on requested scopes.
+
+**Configuration Steps:**
+
+1. **Go to User Attributes Tab**
+2. **Configure Profile Scope:**
+   - ✅ First Name (`given_name`)
+   - ✅ Last Name (`family_name`)
+   - ✅ Email (`email`)
+   - ✅ Username (`username`)
+
+3. **Configure Custom Attributes:**
+   - Add `groups` for RBAC
+   - Add custom claims as needed
+
+**Important:** Attributes are only included if:
+- The attribute is configured for the scope
+- The scope is requested in the authorization request
+- The user has a value for that attribute
+
+### 2.6 Complete Configuration Checklist
+
+**Basic Configuration:**
+- [ ] Client ID and Secret obtained
+- [ ] Allowed grant types: Code, Refresh Token
+- [ ] Authorized redirect URLs added
+- [ ] Allowed origins configured
+
+**Security Configuration:**
+- [ ] PKCE set to Mandatory
+- [ ] Public client enabled (for React)
+- [ ] Token binding configured
+- [ ] Short access token expiry (15 minutes)
+
+**Token Configuration:**
+- [ ] Access token type: JWT
+- [ ] Access token attributes selected
+- [ ] Refresh token renewal enabled
+- [ ] Token expiry times configured
+
+**User Attributes:**
+- [ ] Profile scope attributes configured
+- [ ] `groups` claim added for RBAC
+- [ ] First name and last name included
+
+**Testing:**
+- [ ] Login flow works
+- [ ] Logout flow works
+- [ ] Refresh token flow works
+- [ ] RBAC roles appear in JWT
+
+### 2.7 Asgardeo Server Endpoints
+
+When configuring your application, you'll need to use specific Asgardeo server endpoints for authentication operations.
+
+#### Standard OIDC Endpoints
+
+**For Organization: `testforfinalproject`**
+
+| Endpoint | URL | Purpose |
+|----------|-----|---------|
+| **Issuer** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/token` | Token issuer identifier |
+| **Discovery** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/token/.well-known/openid-configuration` | Auto-discover all endpoints |
+| **Authorize** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/authorize` | Start login flow |
+| **Token** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/token` | Exchange code for tokens |
+| **UserInfo** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/userinfo` | Get user profile |
+| **Introspection** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/introspect` | Validate opaque tokens |
+| **JWKS** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/jwks` | Public keys for JWT validation |
+| **Revoke** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/revoke` | Revoke access/refresh tokens |
+| **Logout** | `https://api.asgardeo.io/t/testforfinalproject/oidc/logout` | End user session |
+| **PAR** | `https://api.asgardeo.io/t/testforfinalproject/oauth2/par` | Pushed Authorization Request |
+
+#### Mutual TLS (mTLS) Endpoints
+
+For applications using mTLS client authentication or certificate token binding:
+
+| Endpoint | URL | Purpose |
+|----------|-----|---------|
+| **PAR (mTLS)** | `https://mtls.asgardeo.io/t/testforfinalproject/oauth2/par` | Pushed Authorization with mTLS |
+| **Token (mTLS)** | `https://mtls.asgardeo.io/t/testforfinalproject/oauth2/token` | Token exchange with mTLS |
+
+**Note:** To use mTLS endpoints, configure certificate-based authentication in the Protocol tab of your Asgardeo application.
+
+#### Usage in Configuration
+
+**React Frontend (`frontend/src/asgardeoConfig.js`):**
+```javascript
+const config = {
+  signInRedirectURL: "http://localhost:3000",
+  signOutRedirectURL: "http://localhost:3000",
+  clientID: "YOUR_CLIENT_ID",
+  baseUrl: "https://api.asgardeo.io",
+  scope: ["openid", "profile", "email"]
+};
+```
+
+**Backend Environment (`.env`):**
+```env
+ASGARDEO_ISSUER=https://api.asgardeo.io/t/testforfinalproject/oauth2/token
+ASGARDEO_AUDIENCE=YOUR_CLIENT_ID
+ASGARDEO_JWKS_URI=https://api.asgardeo.io/t/testforfinalproject/oauth2/jwks
+```
+
+**Discovery Endpoint:**
+The discovery endpoint provides complete metadata about all available endpoints. You can fetch it to auto-configure your application:
+
+```bash
+curl https://api.asgardeo.io/t/testforfinalproject/oauth2/token/.well-known/openid-configuration
+```
+
+**Sample Response:**
+```json
+{
+  "issuer": "https://api.asgardeo.io/t/testforfinalproject/oauth2/token",
+  "authorization_endpoint": "https://api.asgardeo.io/t/testforfinalproject/oauth2/authorize",
+  "token_endpoint": "https://api.asgardeo.io/t/testforfinalproject/oauth2/token",
+  "userinfo_endpoint": "https://api.asgardeo.io/t/testforfinalproject/oauth2/userinfo",
+  "jwks_uri": "https://api.asgardeo.io/t/testforfinalproject/oauth2/jwks",
+  "revocation_endpoint": "https://api.asgardeo.io/t/testforfinalproject/oauth2/revoke",
+  "end_session_endpoint": "https://api.asgardeo.io/t/testforfinalproject/oidc/logout",
+  "response_types_supported": ["code", "id_token", "token"],
+  "grant_types_supported": ["authorization_code", "refresh_token", "client_credentials"],
+  "code_challenge_methods_supported": ["plain", "S256"]
+}
+```
+
+---
+
+## 3. React Integration with Asgardeo
 
 ### Installation
 
