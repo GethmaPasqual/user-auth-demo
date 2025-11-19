@@ -245,5 +245,3 @@ For detailed explanations, see:
 - [Express JWT Docs](https://github.com/auth0/express-oauth2-jwt-bearer)
 
 ---
-
-**Happy Coding! 🎉**
