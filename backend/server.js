@@ -40,6 +40,7 @@ const checkRole = (role) => {
     const hasRole = roles.some(r => r.toLowerCase() === role.toLowerCase());
     
     if (hasRole) {
+      console.log(`✅ Role Check Passed: User has '${role}' role`);
       next(); // User has the role, proceed
     } else {
       res.status(403).json({ 
