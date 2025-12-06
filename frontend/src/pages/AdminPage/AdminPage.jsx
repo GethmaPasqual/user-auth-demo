@@ -10,6 +10,7 @@ function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [hasAdminRole, setHasAdminRole] = useState(false)
+  const [adminInfo, setAdminInfo] = useState({ firstName: '', lastName: '', email: '' })
 
   // Redirect to login if not authenticated
   if (!state.isAuthenticated) {
@@ -23,6 +24,13 @@ function AdminPage() {
         const data = await apiService.getAdmin(token)
         setAdminData(data)
         setHasAdminRole(true)
+        
+        // Extract first name and last name from adminData tokenData
+        setAdminInfo({
+          firstName: data?.tokenData?.given_name || 'N/A',
+          lastName: data?.tokenData?.family_name || 'N/A',
+          email: data?.email || state.email || 'N/A'
+        })
       } catch (err) {
         if (err.response?.status === 403) {
           setHasAdminRole(false)
@@ -36,7 +44,7 @@ function AdminPage() {
     }
 
     fetchAdminData()
-  }, [getAccessToken])
+  }, [getAccessToken, state.email])
 
   // If user doesn't have admin role, show access denied
   if (!loading && !hasAdminRole) {
@@ -73,7 +81,7 @@ function AdminPage() {
         </div>
 
         <div className="welcome-section admin-welcome">
-          <h2>Welcome, Administrator! 👋</h2>
+          <h2>Welcome, {adminInfo.firstName} {adminInfo.lastName}! 👋</h2>
           <p className="admin-role">Role: <span className="badge badge-admin">Admin</span></p>
         </div>
 
@@ -120,12 +128,20 @@ function AdminPage() {
                 <h3>📋 Admin Information</h3>
                 <div className="admin-info">
                   <div className="info-row">
-                    <span className="label">Username:</span>
-                    <span className="value">{adminData?.username || state.username || 'N/A'}</span>
+                    <span className="label">First Name:</span>
+                    <span className="value">{adminInfo.firstName}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Last Name:</span>
+                    <span className="value">{adminInfo.lastName}</span>
                   </div>
                   <div className="info-row">
                     <span className="label">Email:</span>
-                    <span className="value">{adminData?.email || state.email || 'N/A'}</span>
+                    <span className="value">{adminInfo.email}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Username:</span>
+                    <span className="value">{adminData?.username || state.username || 'N/A'}</span>
                   </div>
                   <div className="info-row">
                     <span className="label">User ID:</span>

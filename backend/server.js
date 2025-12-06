@@ -65,9 +65,19 @@ app.get('/api/public', (req, res) => {
 // Private: Requires a valid token (Task 2)
 app.get('/api/private', checkJwt, (req, res) => {
   // If we get here, checkJwt passed
+  
+  // Normalize roles to array format for response
+  let roles = req.auth.roles || [];
+  if (typeof roles === 'string') {
+    roles = roles.split(',').map(r => r.trim());
+  }
+  
   res.json({ 
     message: "This is a private endpoint. You are logged in!",
     user: req.auth.sub || req.auth.preferred_username,
+    username: req.auth.username,
+    email: req.auth.email,
+    roles: roles,
     tokenData: req.auth
   });
 });

@@ -12,7 +12,16 @@ const config = {
   clientID: "KYEfJzks5uXRratlXxNpS9dvpRQa",
   baseUrl: "https://api.asgardeo.io/t/testforfinalproject",
   scope: ["openid", "email", "groups", "profile", "roles"],
-  resourceServerURLs: ["http://localhost:8080"]
+  resourceServerURLs: ["http://localhost:8080"],
+  enablePKCE: true,
+  responseMode: "query",
+  storage: "sessionStorage",
+  validateIDToken: true,
+  validateIDTokenIssuer: true,
+  disableAutoSignIn: true,
+  disableTrySignInSilently: true,
+  clockTolerance: 300,
+  sendCookiesInRequests: true
 }
 
 createRoot(document.getElementById('root')).render(

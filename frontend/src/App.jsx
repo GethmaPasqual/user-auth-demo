@@ -17,7 +17,8 @@ function App() {
     const checkUserRole = async () => {
       if (state.isAuthenticated) {
         try {
-          
+          const idToken = await getDecodedIDToken()
+          console.log('🪙 Decoded ID Token:', idToken)
           // Check for admin role
           const roles = idToken?.roles || []
           const userRoles = typeof roles === 'string' ? roles.split(',').map(r => r.trim()) : roles

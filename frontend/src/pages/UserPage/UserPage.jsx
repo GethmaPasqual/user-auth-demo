@@ -9,6 +9,7 @@ function UserPage() {
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userInfo, setUserInfo] = useState({ firstName: '', lastName: '', email: '' })
 
   // Redirect to login if not authenticated
   if (!state.isAuthenticated) {
@@ -21,6 +22,13 @@ function UserPage() {
         const token = await getAccessToken()
         const data = await apiService.getPrivate(token)
         setUserData(data)
+        
+        // Extract first name and last name from userData tokenData
+        setUserInfo({
+          firstName: data?.tokenData?.given_name || 'N/A',
+          lastName: data?.tokenData?.family_name || 'N/A',
+          email: data?.email || state.email || 'N/A'
+        })
       } catch (err) {
         setError(err.response?.data?.message || err.message)
       } finally {
@@ -29,7 +37,7 @@ function UserPage() {
     }
 
     fetchUserData()
-  }, [getAccessToken])
+  }, [getAccessToken, state.email])
 
   return (
     <div className="user-page">
@@ -46,7 +54,7 @@ function UserPage() {
         </div>
 
         <div className="welcome-section">
-          <h2>Welcome, {state.username || 'User'}! 👋</h2>
+          <h2>Welcome, {userInfo.firstName} {userInfo.lastName}! 👋</h2>
           <p className="user-role">Role: <span className="badge badge-user">User</span></p>
         </div>
 
@@ -55,12 +63,20 @@ function UserPage() {
             <h3>📊 Your Profile</h3>
             <div className="profile-info">
               <div className="info-row">
-                <span className="label">Username:</span>
-                <span className="value">{state.username || 'N/A'}</span>
+                <span className="label">First Name:</span>
+                <span className="value">{userInfo.firstName}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Last Name:</span>
+                <span className="value">{userInfo.lastName}</span>
               </div>
               <div className="info-row">
                 <span className="label">Email:</span>
-                <span className="value">{state.email || 'N/A'}</span>
+                <span className="value">{userInfo.email}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Username:</span>
+                <span className="value">{state.username || 'N/A'}</span>
               </div>
               <div className="info-row">
                 <span className="label">Status:</span>
