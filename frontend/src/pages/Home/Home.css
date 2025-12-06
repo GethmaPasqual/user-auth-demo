@@ -1,4 +1,4 @@
-.login-container {
+.home-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -7,7 +7,7 @@
   padding: 2rem;
 }
 
-.login-card {
+.home-card {
   background: white;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -16,25 +16,25 @@
   overflow: hidden;
 }
 
-.login-header {
+.home-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 2.5rem 2rem;
   text-align: center;
 }
 
-.login-header h1 {
+.home-header h1 {
   margin: 0 0 0.5rem 0;
   font-size: 2rem;
 }
 
-.login-header p {
+.home-header p {
   margin: 0;
   opacity: 0.9;
   font-size: 1rem;
 }
 
-.login-content {
+.home-content {
   padding: 2.5rem 2rem;
 }
 
@@ -55,7 +55,7 @@
   font-size: 1.5rem;
 }
 
-.login-button {
+.home-button {
   width: 100%;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -69,22 +69,22 @@
   margin-bottom: 1rem;
 }
 
-.login-button:hover {
+.home-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
-.login-button:active {
+.home-button:active {
   transform: translateY(0);
 }
 
-.login-info {
+.home-info {
   text-align: center;
   color: #888;
   font-size: 0.9rem;
 }
 
-.login-info p {
+.home-info p {
   margin: 0;
 }
 
@@ -119,11 +119,11 @@
 }
 
 @media (max-width: 600px) {
-  .login-card {
+  .home-card {
     margin: 1rem;
   }
   
-  .login-header h1 {
+  .home-header h1 {
     font-size: 1.5rem;
   }
   

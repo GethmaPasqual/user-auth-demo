@@ -1,12 +1,12 @@
 import { useAuthContext } from "@asgardeo/auth-react"
 import { Navigate } from "react-router-dom"
-import './Login.css'
+import './Home.css'
 
-function Login() {
+function Home() {
   const { state, signIn } = useAuthContext()
 
   // Debug logging
-  console.log("Login Page - Auth State:", state)
+  console.log("Home Page - Auth State:", state)
 
   // If already authenticated, redirect to home
   if (state.isAuthenticated) {
@@ -19,14 +19,14 @@ function Login() {
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
+    <div className="home-container">
+      <div className="home-card">
+        <div className="home-header">
           <h1>🔐 Welcome to Asgardeo Demo</h1>
           <p>Secure Authentication with Role-Based Access Control</p>
         </div>
 
-        <div className="login-content">
+        <div className="home-content">
           <div className="feature-list">
             <div className="feature-item">
               <span className="feature-icon">✅</span>
@@ -48,12 +48,12 @@ function Login() {
 
           <button 
             onClick={handleSignIn} 
-            className="login-button"
+            className="home-button"
           >
             Sign In with Asgardeo
           </button>
 
-          <div className="login-info">
+          <div className="home-info">
             <p>By signing in, you'll be redirected to Asgardeo's secure login page.</p>
           </div>
         </div>
@@ -69,4 +69,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Home
