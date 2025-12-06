@@ -1,69 +1,83 @@
-# Backend README
+# Express TypeScript Backend
 
-## Express.js Backend with Asgardeo JWT Validation
+TypeScript-based Express.js backend with Asgardeo JWT authentication and RBAC.
 
-This backend server validates JWT tokens from Asgardeo and implements role-based access control.
+## 🚀 Quick Start
 
-## Features
-
-- **JWT Validation**: Validates access tokens using JWKS
-- **RBAC**: Role-based access control middleware
-- **CORS**: Enabled for frontend communication
-- **Error Handling**: Proper error responses
-
-## Endpoints
-
-### Public Endpoint
-```
-GET /api/public
-```
-No authentication required. Returns a public message.
-
-### Private Endpoint
-```
-GET /api/private
-Authorization: Bearer <JWT_TOKEN>
-```
-Requires valid JWT token. Returns user information.
-
-### Admin Endpoint
-```
-GET /api/admin
-Authorization: Bearer <JWT_TOKEN>
-```
-Requires valid JWT token AND Admin role. Returns admin-specific data.
-
-## Running the Server
-
-```bash
-npm start
-```
-
-Server will start on `http://localhost:8080`
-
-## Development Mode
-
-```bash
+\`\`\`bash
+npm install
 npm run dev
-```
+\`\`\`
 
-Uses nodemon for auto-reload on file changes.
+Server: **http://localhost:8080**
 
-## How JWT Validation Works
+## 📁 Structure
 
-1. Client sends request with `Authorization: Bearer <token>` header
-2. `checkJwt` middleware extracts and validates token using JWKS
-3. If valid, token data is attached to `req.auth`
-4. `checkRole` middleware (if present) checks for required roles
-5. Request proceeds to route handler or returns error
+\`\`\`
+src/
+├── config/auth.config.ts       # Asgardeo configuration
+├── middleware/
+│   ├── auth.middleware.ts      # JWT & RBAC
+│   └── error.middleware.ts     # Error handling
+├── routes/api.routes.ts        # API endpoints
+├── types/express.d.ts          # TypeScript types
+└── server.ts                   # Main app
+\`\`\`
 
-## Environment Variables
+## 📝 Commands
 
-Create a `.env` file with:
+| Command | Description |
+|---------|-------------|
+| \`npm run dev\` | Development (auto-reload) |
+| \`npm run build\` | Compile TypeScript |
+| \`npm start\` | Run production build |
+| \`npm run typecheck\` | Type checking |
 
-```
-ASGARDEO_CLIENT_ID=your-client-id
-ASGARDEO_JWKS_URI=your-jwks-uri
-ASGARDEO_ISSUER=your-issuer-url
-PORT=8080
-```
+## 📡 API Endpoints
+
+| Endpoint | Auth | Role | Description |
+|----------|------|------|-------------|
+| \`GET /health\` | ❌ | - | Health check |
+| \`GET /api/public\` | ❌ | - | Public data |
+| \`GET /api/private\` | ✅ | - | User data |
+| \`GET /api/admin\` | ✅ | admin | Admin data |
+
+## 🔐 Authentication
+
+- **Provider**: Asgardeo
+- **Client ID**: KYEfJzks5uXRratlXxNpS9dvpRQa
+- **Algorithm**: RS256
+- **JWKS**: https://api.asgardeo.io/t/testforfinalproject/oauth2/jwks
+
+## 🧪 Testing
+
+\`\`\`bash
+# Public
+curl http://localhost:8080/api/public
+
+# Private (with JWT)
+curl -H "Authorization: Bearer TOKEN" http://localhost:8080/api/private
+
+# Admin (with admin JWT)
+curl -H "Authorization: Bearer ADMIN_TOKEN" http://localhost:8080/api/admin
+\`\`\`
+
+## 🛠️ Tech Stack
+
+- TypeScript
+- Express.js
+- express-jwt
+- jwks-rsa
+- CORS
+
+## 🔧 Configuration
+
+Edit \`src/config/auth.config.ts\`:
+- Server port (default: 8080)
+- CORS origin (default: http://localhost:3000)
+
+## 🔗 Frontend Connection
+
+- Backend: http://localhost:8080
+- Frontend: http://localhost:3000
+- CORS pre-configured
